@@ -1,30 +1,35 @@
 <h1>Bus List</h1>
 <div class="" data-ng-controller="BusesController">
-<h1>Closest Stop: {{closestStop}}</h1>
   
-  <ul>
-    <li ng-repeat='bus in busesInRoute.values'>
+  <h1 ng-hide='coordinates'>Finding your location...</h1>
+  
+  <div ng-show='coordinates'>
+    <p>Closest Stop: {{closestStop}}</p>
+    
+    <ul>
+      <li ng-repeat='bus in busesInRoute.values'>
+        {{bus.minutes}} Minutes Away --- {{bus.direction.title}}
+      </li>
+    <ul>
 
-      {{bus.minutes}} Minutes Away --- {{bus.direction.title}}
-    </li>
-  <ul>
-  <!-- <form ng-submit="selectBus()"> -->
     <select ng-model='selectedBus' ng-change='selectBus()' ng-options='bus.title for bus in buses'>
-      <!-- <option data-ng-repeat='bus in buses'> -->
-        <!-- {{bus.title}} -->
-      <!-- </option> -->
     </select>
-    <!-- <input type="text" name='selectedBus' ng-model='selectedBus'> -->
-    <!-- <input type='submit'></input> -->
-  <!-- </form> -->
+
+    <p>My coords are: {{coordinates}}</p>
+    <p>My position is: {{position}}</p>
+
+  </div>  
+
+  <div ng-hide='!busRoutes.length'>
+    My Bus Routes: {{busRoutes}}
+  </div>
 
   <ul>
-    <li ng-repeat="stop in busStops">
-      Lat: {{stop.lat}} Lng: {{stop.lon}}
+    <li ng-repeat='bus in busRoutes'>
+      <span ng-bind='busStops{{bus}}'></span>
     </li>
+    <li>Bus Stops L: {{busStopsN}}</li>
   </ul>
-
-  <h1>My coords are: {{coordinates}}</h1>
-
+  
 </div>
 

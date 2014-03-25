@@ -1,6 +1,6 @@
 // 'use strict';
 
-angular.module('mean.buses').controller('BusesController', ['$scope', 'BusList', 'BusStops', 'PredictTime', '$http', function ($scope, BusList, BusStops, PredictTime, $http) {
+angular.module('mean.buses').controller('BusesController', ['$scope', 'BusList', 'BusStops', 'PredictTime', '$http', '$parse', function ($scope, BusList, BusStops, PredictTime, $http, $parse) {
     // now you can just call it and stick it in a $scope property.
     // it will update the view when it resolves.
     // $scope.buses = Buses.getBusList();
@@ -8,20 +8,36 @@ angular.module('mean.buses').controller('BusesController', ['$scope', 'BusList',
 
       BusList.getBusList().then(function(data){
 
+
         $scope.buses = data.data; 
         
       })
 
+      $scope.busRoutes = [];
 
       $scope.selectBus = function(){
 
+        $scope.addBus()
+
         BusStops.getBusStops($scope.selectedBus.id).then(function(data){
+
+          var string = 'busStops' + $scope.selectedBus.id;
+          var model  = $parse(string);
+          model.assign($scope, data.data.stops);
 
           $scope.busStops = data.data.stops;
 
           $scope.closestBusStop();
 
+          console.log($scope)
+
         })
+
+      }
+
+      $scope.addBus = function(){
+
+        $scope.busRoutes.push($scope.selectedBus.id)
 
       }
 
@@ -43,6 +59,7 @@ angular.module('mean.buses').controller('BusesController', ['$scope', 'BusList',
             console.log('More or less ' + crd.accuracy + ' meters.');
 
             $scope.coordinates = crd;
+            $scope.position = pos;
             $scope.$apply()
 
           };
@@ -64,26 +81,6 @@ angular.module('mean.buses').controller('BusesController', ['$scope', 'BusList',
 
         if($scope.busStops){
 
-          // var closest = null
-          // var closestStop = null
-
-          // $scope.busStops.forEach(function(stop){
-          //   console.log(stop)
-            
-          //   var stopLatLon = new google.maps.LatLng(stop.lat, stop.lon);
-          //   var myLatLon   = new google.maps.LatLng($scope.coordinates.latitude, $scope.coordinates.longitude)
-          //   var dist = google.maps.geometry.spherical.computeDistanceBetween(stopLatLon, myLatLon);
-
-          //   if(closest === null || closest > dist){
-              
-          //     closest = dist;
-          //     closestStop = stop;
-
-          //   } 
-
-          //   console.log(closestStop)
-              
-          // })
 
           $scope.closestStop = _.reduce($scope.busStops, function(closest, stop){ 
 
