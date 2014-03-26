@@ -1,7 +1,7 @@
 <h1>Bus List</h1>
 <div class="" data-ng-controller="BusesController">
   
-  <h1 ng-hide='coordinates'>Finding your location...</h1>
+  <!-- <h1 ng-hide='coordinates'>Finding your location...</h1>
   
   <div ng-show='coordinates'>
     <p>Closest Stop: {{closestStop}}</p>
@@ -10,26 +10,41 @@
       <li ng-repeat='bus in busesInRoute.values'>
         {{bus.minutes}} Minutes Away --- {{bus.direction.title}}
       </li>
-    <ul>
+    <ul> -->
 
     <select ng-model='selectedBus' ng-change='selectBus()' ng-options='bus.title for bus in buses'>
     </select>
 
-    <p>My coords are: {{coordinates}}</p>
+<!--     <p>My coords are: {{coordinates}}</p>
     <p>My position is: {{position}}</p>
 
-  </div>  
+  </div>   -->
 
   <div ng-hide='!busRoutes.length'>
     My Bus Routes: {{busRoutes}}
   </div>
 
-  <ul>
+  {{myBuses}}
+  <!-- <ul>
     <li ng-repeat='bus in busRoutes'>
       <span ng-bind='busStops{{bus}}'></span>
     </li>
     <li>Bus Stops L: {{busStopsN}}</li>
-  </ul>
+  </ul> -->
   
+  <ul>
+    <li ng-repeat='stop in myBuses'>
+      <div>Route: {{stop.route.title}} {{stop.route.id}}</div>
+      <div>{{stop.stop.title}} {{stop.stop.distance}}</div>
+
+        <div ng-repeat="bus in stop.values">
+          Direction:{{bus.direction.title}}
+          Time: {{bus.minutes}}
+        </div>
+        <!-- <div>Time: {{bus}}</div> -->
+      </p>
+      
+    </li>
+  </ul>
 </div>
 

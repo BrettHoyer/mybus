@@ -1,9 +1,20 @@
 // 'use strict';
 
-angular.module('mean.buses').controller('BusesController', ['$scope', 'BusList', 'BusStops', 'PredictTime', '$http', '$parse', function ($scope, BusList, BusStops, PredictTime, $http, $parse) {
+angular.module('mean.buses').controller('BusesController', ['$scope', '$location', 'BusList', 'BusStops', 'PredictTime', 'NearbyBuses', 'MyBuses', '$http', '$parse', function ($scope, $location, BusList, BusStops, PredictTime, NearbyBuses, MyBuses, $http, $parse) {
     // now you can just call it and stick it in a $scope property.
     // it will update the view when it resolves.
     // $scope.buses = Buses.getBusList();
+
+    $scope.create = function(id) {
+        var myBus = new MyBuses({
+            bus_id: id,
+        });
+        myBus.$save(function(response) {
+            $location.path('myBuses/' + response._id);
+        });
+
+        this.id = '';
+    };
 
 
       BusList.getBusList().then(function(data){
@@ -19,8 +30,11 @@ angular.module('mean.buses').controller('BusesController', ['$scope', 'BusList',
 
         $scope.addBus()
 
+        $scope.create($scope.selectedBus.id)
+
         BusStops.getBusStops($scope.selectedBus.id).then(function(data){
 
+          console.log(data.data.stops)
           var string = 'busStops' + $scope.selectedBus.id;
           var model  = $parse(string);
           model.assign($scope, data.data.stops);
@@ -29,7 +43,6 @@ angular.module('mean.buses').controller('BusesController', ['$scope', 'BusList',
 
           $scope.closestBusStop();
 
-          console.log($scope)
 
         })
 
@@ -39,6 +52,9 @@ angular.module('mean.buses').controller('BusesController', ['$scope', 'BusList',
 
         $scope.busRoutes.push($scope.selectedBus.id)
 
+        $scope.myNearbyBuses()
+        
+
       }
 
       $scope.getLocation = function(){
@@ -46,7 +62,7 @@ angular.module('mean.buses').controller('BusesController', ['$scope', 'BusList',
 
           var options = {
             enableHighAccuracy: true,
-            timeout: 5000,
+            // timeout: 5000,
             maximumAge: 0
           };
 
@@ -62,6 +78,18 @@ angular.module('mean.buses').controller('BusesController', ['$scope', 'BusList',
             $scope.position = pos;
             $scope.$apply()
 
+
+            // NearbyBuses.getAllNearby(crd.latitude, crd.longitude).then(function(res){
+            NearbyBuses.getAllNearby(37.794374, -122.417532).then(function(res){
+              console.log("nearby buses", res)
+              $scope.nearbyBuses = res.data
+
+            })
+
+             console.log($scope)
+
+
+
           };
 
           function error(err) {
@@ -72,6 +100,13 @@ angular.module('mean.buses').controller('BusesController', ['$scope', 'BusList',
         }
       }
 
+      $scope.myNearbyBuses = function(){
+        $scope.myBuses = _.filter($scope.nearbyBuses, function(stop){
+
+                return _.contains($scope.busRoutes, stop.route.id)
+              
+              })
+      }
 
 
       $scope.getLocation(); 
